@@ -20,7 +20,3 @@ para ter acesso ao banco de dados e poder utilizar a aplicação de forma corret
     GIN_MODE=release go test -v -v -coverpkg=./controllers
 	
   Se tudo foi feito corretamente ele ira rodar todos os testes.
-
-  Caso a instalação do docker tenha dado errado, acesse:
-  
-  [[NUPED] Instalação do docker](https://docs.google.com/document/d/1GUV-jyBQZDuG_sSoKHyDHwLbMR9baZMDxKht7kxWCec/edit?usp=sharing)
