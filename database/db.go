@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 
+	"github.com/OmnGabriel/go-api-rest.git/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,4 +20,5 @@ func ConnectWithDatabase() {
 	if err != nil {
 		log.Panic("Error connecting to database")
 	}
+	DB.AutoMigrate(&models.Character{})
 }

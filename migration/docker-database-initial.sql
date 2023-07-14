@@ -1,5 +1,4 @@
 create table characters(
-    id serial primary key,
     name varchar,
     backStory varchar
 );
