@@ -1,60 +1,73 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/OmnGabriel/go-api-rest.git/database"
 	"github.com/OmnGabriel/go-api-rest.git/models"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Home Page")
+func Home(c *gin.Context) {
+	fmt.Fprint(c.Writer, "Home Page")
 
 }
 
-func AllCharacters(w http.ResponseWriter, r *http.Request) {
-
+func AllCharacters(c *gin.Context) {
 	var character []models.Character
 	database.DB.Find(&character)
-	json.NewEncoder(w).Encode(character)
+
+	c.JSON(http.StatusOK, gin.H{"character": character})
 
 }
 
-func ReturnACharacter(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+func MakeANewCharacter(c *gin.Context) {
 	var character models.Character
-
-	database.DB.First(&character, id)
-	json.NewEncoder(w).Encode(character)
+	if err := c.ShouldBindJSON(&character); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+	database.DB.Create(&character)
+	c.JSON(http.StatusCreated, character)
 }
 
-func MakeANewCharacter(w http.ResponseWriter, r *http.Request) {
-	var newCharacter models.Character
-	json.NewDecoder(r.Body).Decode(&newCharacter)
-	database.DB.Create(&newCharacter)
-	json.NewEncoder(w).Encode(newCharacter)
-}
-
-func DeletACharacter(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+func DeletACharacter(c *gin.Context) {
 	var character models.Character
+	id := c.Params.ByName("id")
 	database.DB.Delete(&character, id)
-	json.NewEncoder(w).Encode(character)
+	c.JSON(http.StatusOK, gin.H{"data": "Character has been deleted"})
 
 }
 
-func EditACharacter(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+func ReturnACharacter(c *gin.Context) {
 	var character models.Character
-
+	id := c.Params.ByName("id")
 	database.DB.First(&character, id)
-	json.NewDecoder(r.Body).Decode(&character)
-	database.DB.Save(&character)
-	json.NewEncoder(w).Encode(character)
+
+	if character.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not found": "Character not afound"})
+		return
+	}
+
+	c.JSON(http.StatusOK, character)
+}
+
+func EditACharacter(c *gin.Context) {
+	var character models.Character
+	id := c.Params.ByName("id")
+	database.DB.First(&character, id)
+
+	var characterToUpdate models.Character
+	if err := c.ShouldBindJSON(&characterToUpdate); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"erro": err.Error()})
+		return
+	}
+
+	database.DB.Model(&character).Updates(characterToUpdate)
+	c.JSON(http.StatusOK, gin.H{"data": "Successfully changed character"})
+	c.JSON(http.StatusOK, character)
 }

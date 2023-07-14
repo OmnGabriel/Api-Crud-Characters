@@ -1,9 +1,9 @@
 package models
 
+import "gorm.io/gorm"
+
 type Character struct {
-	Id        int    `json:"id"`
+	gorm.Model
 	Name      string `json:"name"`
 	Backstory string `json:"backstory"`
 }
-
-var Characters []Character

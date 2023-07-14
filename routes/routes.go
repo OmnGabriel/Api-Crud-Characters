@@ -6,17 +6,18 @@ import (
 
 	"github.com/OmnGabriel/go-api-rest.git/controllers"
 	"github.com/OmnGabriel/go-api-rest.git/middleware"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 func HandleRequest() {
-	r := mux.NewRouter()
-	r.Use(middleware.ContentTypeMiddleware)
-	r.HandleFunc("/", controllers.Home)
-	r.HandleFunc("/api/characters", controllers.AllCharacters).Methods("Get")
-	r.HandleFunc("/api/characters/{id}", controllers.ReturnACharacter).Methods("Get")
-	r.HandleFunc("/api/characters", controllers.MakeANewCharacter).Methods("Post")
-	r.HandleFunc("/api/characters/{id}", controllers.DeletACharacter).Methods("Delete")
-	r.HandleFunc("/api/characters/{id}", controllers.EditACharacter).Methods("Put")
-	log.Fatal(http.ListenAndServe(":8000", r))
+	r := gin.Default()
+	r.Use(middleware.ContentTypeMiddleware())
+
+	r.GET("/", controllers.Home)
+	r.GET("/api/characters", controllers.AllCharacters)
+	r.GET("/api/characters/:id", controllers.ReturnACharacter)
+	r.POST("/api/characters", controllers.MakeANewCharacter)
+	r.DELETE("/api/characters/:id", controllers.DeletACharacter)
+	r.PATCH("/api/characters/:id", controllers.EditACharacter)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
