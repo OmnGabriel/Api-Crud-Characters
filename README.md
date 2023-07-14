@@ -1,4 +1,4 @@
-# go-api-rest
+# Api Crud Characters
 -----------------------------------
 Como instalar o projeto:
 
