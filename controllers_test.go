@@ -147,7 +147,7 @@ func TestToCheckIfTheFunctionReturnACharacterIsReallyReturningACharacter(t *test
 
 }
 
-func TestToCheckFunctionTypeOfEditACharacter(t *testing.T) {
+func TestToCheckValidRequestOfFunctionEditACharacter(t *testing.T) {
 	//Arrange
 	database.ConnectWithDatabase()
 	MakeANewCharacterMock()
@@ -171,7 +171,7 @@ func TestToCheckFunctionTypeOfEditACharacter(t *testing.T) {
 
 }
 
-func TestToChecRequestOfFunctionEditACharacter(t *testing.T) {
+func TestToCheckNonValidRequestOfFunctionEditACharacter(t *testing.T) {
 	//Arrange
 	database.ConnectWithDatabase()
 	MakeANewCharacterMock()
