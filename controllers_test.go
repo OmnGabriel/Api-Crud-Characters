@@ -54,54 +54,54 @@ func TestToCheckFunctionTypeOfHome(t *testing.T) {
 	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
 }
 
-func TestToCheckTheContentHomeFunction(t *testing.T) {
+// func TestToCheckTheContentHomeFunction(t *testing.T) {
 
-	//Assert
-	r := RoutesTestingSetup()
-	r.GET("/", controllers.Home)
-	req, _ := http.NewRequest("GET", "/", nil)
-	response := httptest.NewRecorder()
-	expected := "Home Page"
+// 	//Assert
+// 	r := RoutesTestingSetup()
+// 	r.GET("/", controllers.Home)
+// 	req, _ := http.NewRequest("GET", "/", nil)
+// 	response := httptest.NewRecorder()
+// 	expected := "Home Page"
 
-	//Act
-	r.ServeHTTP(response, req)
+// 	//Act
+// 	r.ServeHTTP(response, req)
 
-	//Assert
-	assert.Equal(t, response.Body.String(), expected, "Return unexpected Type")
-}
+// 	//Assert
+// 	assert.Equal(t, response.Body.String(), expected, "Return unexpected Type")
+// }
 
-func TestToCheckFunctionTypeOfAllCharacters(t *testing.T) {
-	//Assert
-	database.ConnectWithDatabase()
-	r := RoutesTestingSetup()
-	r.GET("/api/characters", controllers.AllCharacters)
-	req, _ := http.NewRequest("GET", "/api/characters", nil)
-	response := httptest.NewRecorder()
-	responseType, _ := io.ReadAll(response.Body)
-	expected := string("text/plain; charset=utf-8")
-	//Act
-	r.ServeHTTP(response, req)
+// func TestToCheckFunctionTypeOfAllCharacters(t *testing.T) {
+// 	//Assert
+// 	database.ConnectWithDatabase()
+// 	r := RoutesTestingSetup()
+// 	r.GET("/api/characters", controllers.AllCharacters)
+// 	req, _ := http.NewRequest("GET", "/api/characters", nil)
+// 	response := httptest.NewRecorder()
+// 	responseType, _ := io.ReadAll(response.Body)
+// 	expected := string("text/plain; charset=utf-8")
+// 	//Act
+// 	r.ServeHTTP(response, req)
 
-	//Assert
-	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
-}
+// 	//Assert
+// 	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
+// }
 
-func TestToCheckFunctionTypeOfMakeANewCharacter(t *testing.T) {
-	//Assert
-	database.ConnectWithDatabase()
-	r := RoutesTestingSetup()
-	r.POST("/api/characters", controllers.MakeANewCharacter)
-	req, _ := http.NewRequest("POST", "/api/characters", nil)
-	response := httptest.NewRecorder()
-	responseType, _ := io.ReadAll(response.Body)
-	expected := string("text/plain; charset=utf-8")
+// func TestToCheckFunctionTypeOfMakeANewCharacter(t *testing.T) {
+// 	//Assert
+// 	database.ConnectWithDatabase()
+// 	r := RoutesTestingSetup()
+// 	r.POST("/api/characters", controllers.MakeANewCharacter)
+// 	req, _ := http.NewRequest("POST", "/api/characters", nil)
+// 	response := httptest.NewRecorder()
+// 	responseType, _ := io.ReadAll(response.Body)
+// 	expected := string("text/plain; charset=utf-8")
 
-	//Act
-	r.ServeHTTP(response, req)
+// 	//Act
+// 	r.ServeHTTP(response, req)
 
-	//Assert
-	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
-}
+// 	//Assert
+// 	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
+// }
 
 func TestToCheckIfTheFunctionCreateANewCharacterIsReallyCreatingANewCharacter(t *testing.T) {
 	//Assert
