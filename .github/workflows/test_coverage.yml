@@ -1,4 +1,4 @@
-name: Go
+name: Coverage
 
 on:
   push:
@@ -44,3 +44,6 @@ jobs:
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
+        
+        rm -f coverage-out.txt
+        rm -f go-api-rest.git
