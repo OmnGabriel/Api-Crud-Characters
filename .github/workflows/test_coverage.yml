@@ -22,7 +22,7 @@ jobs:
       run: docker-compose up -d
    
     - name: Build 
-      run: go build -v ../..
+      run: go build -v
 
     - name: Test
       run: GIN_MODE=release go test -v -v -coverpkg=./controllers
