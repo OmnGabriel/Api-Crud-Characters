@@ -59,7 +59,9 @@ jobs:
         git config user.email github-actions@github.com
         git fetch
         git checkout ${{ steps.current_branch.outputs.current_branch }}
-
+        variavel=$(git branch)
+        echo $variavel
+        
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
