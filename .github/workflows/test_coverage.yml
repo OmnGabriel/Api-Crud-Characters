@@ -41,7 +41,7 @@ jobs:
           exit -1
         else
           COLOR=green
-          printf "\033[0;32mCode coverage %.1f%% is \033[0m\n" $BRANCHCOV 
+          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $BRANCHCOV 
         fi
         
         git config user.name github-actions
