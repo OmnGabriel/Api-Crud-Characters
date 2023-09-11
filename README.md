@@ -1,3 +1,5 @@
+![Coverage](https://github.com/OmnGabriel/Api-Crud-Characters/blob/badge/badge.svg)
+
 # Api Crud Characters
 -----------------------------------
 Como instalar o projeto:
