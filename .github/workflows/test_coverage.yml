@@ -32,12 +32,10 @@ jobs:
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-        COVERAGE_GATE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
 
         COVERAGE_GATE=87.1
-        COVERAGE_PASSES=$(echo "$CODE_COVERAGE > $COVERAGE_GATE" | bc)
-
-        if [ $COVERAGE_PASSES -ne 1 ]; then
+        if [ $CODE_COVERAGE -lt COVERAGE_GATE ]; then
           COLOR=red
         else
           COLOR=green
@@ -47,13 +45,13 @@ jobs:
         git config user.email github-actions@github.com
         git fetch
         git checkout badge -f
-        curl "https://img.shields.io/badge/coverage-$BRANCHCOV%25-$COLOR" > badge.svg
+        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
 
-        if [ $COVERAGE_PASSES -ne 1 ]; then
-          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
+        if [ $CODE_COVERAGE -lt COVERAGE_GATE  ]; then
+          printf "\033[0;31mCode coverage: %.1f%% is less than required: %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
           exit -1
         else
           printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
