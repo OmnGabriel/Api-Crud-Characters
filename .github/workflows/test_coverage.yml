@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
     - uses: actions/checkout@v3
 
@@ -27,6 +28,22 @@ jobs:
     - name: Build 
       run: go build -v
   
+    - name: Run tests and generate coverage report and comment in PR
+      run: |
+        go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
+        go tool cover -html=coverage.out -o coverage.html
+
+        PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+        echo "Número do PR: $PR_NUMBER"
+
+        GITHUB_REPOSITORY="OmnGabriel/Api-Crud-Characters"
+
+        coverage_report=$(cat coverage.html | base64 -w 0)
+        curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -d "{\"body\":\"![Coverage Report](data:text/html;base64,$coverage_report)\"}" \
+          "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
+        
+    
     - name: Generate Coverage Percent
       run: |
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
@@ -56,3 +73,5 @@ jobs:
         else
           printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
         fi
+
+      
