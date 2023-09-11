@@ -60,11 +60,15 @@ jobs:
 
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+
         COLOR=orange
-        if (( $(echo $BRANCHCOV <= $MAINCOV | bc -l) )); then
+        if (( $(echo "$BRANCHCOV" < "$MAINCOV" | bc -l) )); then
           COLOR=red
-        elif (( $(echo $BRANCHCOV > $MAINCOV | bc -l) )); then
+          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $MAINCOV
+          exit -1
+        else
           COLOR=green
+          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $BRANCHCOV
         fi
         
         git config user.name github-actions
