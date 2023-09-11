@@ -55,15 +55,15 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git fetch
-        git checkout $CURRENT_BRANCH"  
+        git checkout $CURRENT_BRANCH  
 
 
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
         COLOR=orange
-        if (( $(echo "$BRANCHCOV <= $MAINCOV" | bc -l) )); then
+        if (( $(echo $BRANCHCOV <= $MAINCOV | bc -l) )); then
           COLOR=red
-        elif (( $(echo "$BRANCHCOV > $MAINCOV" | bc -l) )); then
+        elif (( $(echo $BRANCHCOV > $MAINCOV | bc -l) )); then
           COLOR=green
         fi
         
