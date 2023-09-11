@@ -58,7 +58,7 @@ jobs:
         git fetch
         git checkout ${{ steps.current_branch.outputs.current_branch }}
 
-        run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
+        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
