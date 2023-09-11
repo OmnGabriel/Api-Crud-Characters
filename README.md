@@ -1,4 +1,4 @@
-![Coverage](https://github.com/OmnGabriel/Api-Crud-Characters/blob/badge/badge.svg)
+![Coverage](https://github.com/OmnGabriel/Api-Crud-Characters/blob/main/badge.svg)
 
 # Api Crud Characters
 -----------------------------------
