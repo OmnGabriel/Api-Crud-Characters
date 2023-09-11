@@ -55,13 +55,12 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git fetch
-        git checkout $CURRENT_BRANCH  
+        git checkout "$CURRENT_BRANCH"  
 
 
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
 
-        COLOR=orange
         if (( $(echo "$BRANCHCOV" < "$MAINCOV" | bc -l) )); then
           COLOR=red
           printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $MAINCOV
