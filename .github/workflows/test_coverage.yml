@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GITH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
     - uses: actions/checkout@v3
 
@@ -41,13 +41,8 @@ jobs:
         fi
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git checkout -b badge -f
+        git checkout badge -f
         curl "https://img.shields.io/badge/coverage-$COBERTURA%25-$COLOR" > badge.svg
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
-        # Crie um comentário no PR com a badge
-        echo "![Badge]($BADGE_URL)" > badge.md
-        gh pr comment ${{ github.event.pull_request.number }} --body "$(cat badge.md)"
-        rm -f coverage-out.txt
-        rm -f go-api-rest.git
