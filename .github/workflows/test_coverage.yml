@@ -46,8 +46,3 @@ jobs:
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
-        # Crie um comentário no PR com a badge
-        echo "![Badge]($BADGE_URL)" > badge.md
-        gh pr comment ${{ github.event.pull_request.number }} --body "$(cat badge.md)"
-        rm -f coverage-out.txt
-        rm -f go-api-rest.git
