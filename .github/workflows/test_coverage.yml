@@ -63,7 +63,8 @@ jobs:
 
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-
+        echo "maincov = $MAINCOV"
+        echo "branchvoc = $BRANCHCOV"
         if (( $(echo "$BRANCHCOV" -lt "$MAINCOV" | bc -l) )); then
           COLOR=red
           printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $MAINCOV
