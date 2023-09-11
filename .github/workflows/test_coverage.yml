@@ -26,7 +26,6 @@ jobs:
         CURRENT_BRANCH=${{ github.ref }}
         echo "Current branch: $CURRENT_BRANCH"
         echo "{current_branch}=={$CURRENT_BRANCH}" >> $GITHUB_OUTPUT
-
       id: current_branch
   
     - name: UpDocker
@@ -34,6 +33,18 @@ jobs:
    
     - name: Build 
       run: go build -v
+      
+    - name: Generate Current Branch Coverage Percent
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout ${{ steps.current_branch.outputs.current_branch }}
+        variavel=$(git branch)
+        echo $variavel
+        
+        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
+
 
     - name: Main Branch Test Coverage
       run: | 
@@ -49,7 +60,10 @@ jobs:
       run: |
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         MAINCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-        echo "maincov = $MAINCOV"
+        echo "{coverage_main}=={$MAINCOV}" >> $GITHUB_OUTPUT
+        echo "maincov: $MAINCOV"
+        
+      id: coverage_main
 
 
   
@@ -67,13 +81,13 @@ jobs:
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
         echo "branchvoc = $BRANCHCOV"
-        if (( $(echo "$BRANCHCOV" -lt "$MAINCOV" | bc -l) )); then
+        if (( $(echo "$BRANCHCOV" -lt "${{ steps.coverage_main.outputs.coverage_main }}" | bc -l) )); then
           COLOR=red
-          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $MAINCOV
+          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV ${{ steps.coverage_main.outputs.coverage_main }}
           exit -1
         else
           COLOR=green
-          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $BRANCHCOV
+          printf "\033[0;32mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV ${{ steps.coverage_main.outputs.coverage_main }}
         fi
         
         git config user.name github-actions
