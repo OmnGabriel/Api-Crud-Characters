@@ -25,7 +25,8 @@ jobs:
       run: |
         CURRENT_BRANCH=${{ github.ref }}
         echo "Current branch: $CURRENT_BRANCH"
-        echo "::set-output name=current_branch::$CURRENT_BRANCH"
+        echo "{current_branch}=={$CURRENT_BRANCH}" >> $GITHUB_OUTPUT
+
       id: current_branch
   
     - name: UpDocker
