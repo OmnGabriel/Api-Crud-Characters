@@ -28,6 +28,7 @@ jobs:
       run: go build -v
   
     - name: Generate Coverage Percent
+      run: |
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
