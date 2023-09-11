@@ -41,6 +41,7 @@ jobs:
         fi
         git config user.name github-actions
         git config user.email github-actions@github.com
+        git fetch
         git checkout badge -f
         curl "https://img.shields.io/badge/coverage-$COBERTURA%25-$COLOR" > badge.svg
         git add badge.svg
