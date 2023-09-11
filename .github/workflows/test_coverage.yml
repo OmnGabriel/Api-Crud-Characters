@@ -25,53 +25,53 @@ jobs:
       run: |
         CURRENT_BRANCH=${{ github.ref }}
         echo "Current branch: $CURRENT_BRANCH"
-        id: current_branch
   
-
-    # - name: UpDocker
-    #   run: docker-compose up -d
+    - name: UpDocker
+      run: docker-compose up -d
    
-    # - name: Build 
-    #   run: go build -v
+    - name: Build 
+      run: go build -v
+      
+    - name: Current Branch Test Coverage
+      run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
 
-    # - name: Main Test
-    #   run: | 
-    #     git config user.name github-actions
-    #     git config user.email github-actions@github.com
-    #     git fetch
-    #     git checkout main -f
+    - name: Main Branch Test Coverage
+      run: | 
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout main
 
-    #     GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
+        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
 
-    # - name: Main Coverage
-    #   run: |
-    #     PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-    #     MAINCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-    #     COLOR=orange
-    #     if (( $(echo "$MAINCOV <= 50" | bc -l) )); then
-    #       COLOR=red
-    #     elif (( $(echo "$MAINCOV > 80" | bc -l) )); then
-    #       COLOR=green
-    #     fi
+    - name: Generate Main Branch Coverage Percent
+      run: |
+        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
+        MAINCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
 
-    # - name: Branch Test
-    #   run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
   
-    # - name: Branch Coverage
-    #   run: |
-    #     PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-    #     COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-    #     COLOR=orange
-    #     if (( $(echo "$BRANCHCOV <= 50" | bc -l) )); then
-    #       COLOR=red
-    #     elif (( $(echo "$BRANCHCOV > 80" | bc -l) )); then
-    #       COLOR=green
-    #     fi
-    #     git config user.name github-actions
-    #     git config user.email github-actions@github.com
-    #     git fetch
-    #     git checkout badge -f
-    #     curl "https://img.shields.io/badge/coverage-$BRANCHCOV%25-$COLOR" > badge.svg
-    #     git add badge.svg
-    #     git commit -m "change badge" || true
-    #     git push origin badge
+    - name: Generate Current Branch Coverage Percent
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout $CURRENT_BRANCH"  
+
+
+        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
+        COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        COLOR=orange
+        if (( $(echo "$BRANCHCOV <= 50" | bc -l) )); then
+          COLOR=red
+        elif (( $(echo "$BRANCHCOV > 80" | bc -l) )); then
+          COLOR=green
+        fi
+        
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout badge -f
+        curl "https://img.shields.io/badge/coverage-$BRANCHCOV%25-$COLOR" > badge.svg
+        git add badge.svg
+        git commit -m "change badge" || true
+        git push origin badge
