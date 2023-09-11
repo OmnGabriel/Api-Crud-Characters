@@ -55,6 +55,7 @@ jobs:
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
+        git fetch
         git checkout ${{ steps.current_branch.outputs.current_branch }}
 
         run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
