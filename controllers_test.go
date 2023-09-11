@@ -79,9 +79,9 @@ func TestToCheckFunctionTypeOfAllCharacters(t *testing.T) {
 	//Act
 	r.ServeHTTP(response, req)
 
-// 	//Assert
-// 	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
-// }
+	//Assert
+	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
+}
 
 // func TestToCheckFunctionTypeOfMakeANewCharacter(t *testing.T) {
 // 	//Assert
