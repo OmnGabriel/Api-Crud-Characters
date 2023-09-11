@@ -34,7 +34,7 @@ jobs:
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
 
-        COVERAGE_GATE="87.1"
+        COVERAGE_GATE=87.1
         if (( $(echo "$BRANCHCOV" -lt "$COVERAGE_GATE" | bc -l) )); then
           COLOR=red
           printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $COVERAGE_GATE
