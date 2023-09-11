@@ -20,74 +20,27 @@ jobs:
       with:
         go-version: '1.20'
         token: ${{ secrets.GH_TOKEN }}
-
-    - name: Get Current Branch Name
-      run: |
-        CURRENT_BRANCH=${{ github.ref }}
-        echo "Current branch: $CURRENT_BRANCH"
-        echo "{current_branch}=={$CURRENT_BRANCH}" >> $GITHUB_OUTPUT
-      id: current_branch
   
     - name: UpDocker
       run: docker-compose up -d
    
     - name: Build 
       run: go build -v
-      
-    - name: Generate Current Branch Coverage Percent
-      run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout ${{ steps.current_branch.outputs.current_branch }}
-        variavel=$(git branch)
-        echo $variavel
-        
-        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
-
-
-    - name: Main Branch Test Coverage
-      run: | 
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout main
-
-        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
-        
-
-    - name: Generate Main Branch Coverage Percent
-      run: |
-        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-        MAINCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-        echo "{coverage_main}=={$MAINCOV}" >> $GITHUB_OUTPUT
-        echo "maincov: $MAINCOV"
-        
-      id: coverage_main
-
-
   
-    - name: Generate Current Branch Coverage Percent
-      run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout ${{ steps.current_branch.outputs.current_branch }}
-        variavel=$(git branch)
-        echo $variavel
-        
+    - name: Generate Coverage Percent
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
         BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-        echo "branchvoc = $BRANCHCOV"
-        if (( $(echo "$BRANCHCOV" -lt "${{ steps.coverage_main.outputs.coverage_main }}" | bc -l) )); then
+
+        COVERAGE_GATE="87.1"
+        if (( $(echo "$BRANCHCOV" -lt "$COVERAGE_GATE" | bc -l) )); then
           COLOR=red
-          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV ${{ steps.coverage_main.outputs.coverage_main }}
+          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $COVERAGE_GATE
           exit -1
         else
           COLOR=green
-          printf "\033[0;32mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV ${{ steps.coverage_main.outputs.coverage_main }}
+          printf "\033[0;32mCode coverage %.1f%% is \033[0m\n" $BRANCHCOV 
         fi
         
         git config user.name github-actions
