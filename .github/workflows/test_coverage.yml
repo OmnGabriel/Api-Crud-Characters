@@ -32,16 +32,15 @@ jobs:
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
         PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-        BRANCHCOV=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        COVERAGE_GATE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
 
         COVERAGE_GATE=87.1
-        if (( $(echo "$BRANCHCOV" < "$COVERAGE_GATE" | bc -l) )); then
+        COVERAGE_PASSES=$(echo "$CODE_COVERAGE > $COVERAGE_GATE" | bc)
+
+        if [ $COVERAGE_PASSES -ne 1 ]; then
           COLOR=red
-          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $BRANCHCOV $COVERAGE_GATE
-          exit -1
         else
           COLOR=green
-          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $BRANCHCOV 
         fi
         
         git config user.name github-actions
@@ -52,3 +51,10 @@ jobs:
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
+
+        if [ $COVERAGE_PASSES -ne 1 ]; then
+          printf "\033[0;31mCode coverage %.1f%% is less than required %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
+          exit -1
+        else
+          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
+        fi
