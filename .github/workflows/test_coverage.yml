@@ -38,7 +38,7 @@ jobs:
 
         GITHUB_REPOSITORY="OmnGabriel/Api-Crud-Characters"
 
-        coverage_report=$(cat coverage.html | base64 -w 0)
+        coverage_report= coverage.html
         curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -d "{\"body\":\"![Coverage Report](data:text/html;base64,$coverage_report)\"}" \
           "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
