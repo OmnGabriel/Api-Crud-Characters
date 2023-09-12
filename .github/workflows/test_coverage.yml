@@ -33,7 +33,6 @@ jobs:
         GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
         go tool cover -html=coverage.out -o coverage.html
 
-
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
         echo "Número do PR: $PR_NUMBER"
 
@@ -46,12 +45,8 @@ jobs:
           
         echo "Coverage Report: $coverage_report"
         echo "Número do PR: $PR_NUMBER"
+        base64 -w 0 coverage.html
 
-    - name: Publicar Relatório de Cobertura
-      uses: actions/upload-artifact@v2
-      with:
-          name: coverage-report
-          path: $GITHUB_WORKSPACE/coverage.html
     
     - name: Generate Coverage Percent
       run: |
