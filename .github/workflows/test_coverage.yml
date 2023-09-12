@@ -32,7 +32,7 @@ jobs:
       run: |
         GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
         go tool cover -html=coverage.out -o coverage.html
-        mv coverage.html $GITHUB_WORKSPACE
+
 
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
         echo "Número do PR: $PR_NUMBER"
