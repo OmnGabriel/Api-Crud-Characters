@@ -30,15 +30,17 @@ jobs:
   
     - name: Run tests and generate coverage report and comment in PR
       run: |
-        GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
-        go tool cover -html=coverage.out -o coverage.html >> $GITHUB_STEP_SUMMARY
-        pandoc coverage.html -o coverage.md
+        go test -v -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+        go-junit-report < coverage.out > report.xml
+      # GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
+      # go tool cover -html=coverage.out -o coverage.html
+
     
-    # - name: Upload coverage HTML report
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #       name: coverage-report
-    #       path: coverage.html
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+          name: coverage-report
+          path: report.xml
 
     - name: Comment on PR with code coverage report
       uses: actions/github-script@v6
