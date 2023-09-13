@@ -32,12 +32,13 @@ jobs:
       run: |
         GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
         go tool cover -html=coverage.out -o coverage.html >> $GITHUB_STEP_SUMMARY
+        pandoc coverage.html -o coverage.md
     
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v3
-      with:
-          name: coverage-report
-          path: coverage.html
+    # - name: Upload coverage HTML report
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #       name: coverage-report
+    #       path: coverage.html
 
     - name: Comment on PR with code coverage report
       uses: actions/github-script@v6
@@ -45,7 +46,7 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs');
-          const report = fs.readFileSync('coverage.html', 'utf-8');
+          const markdownReport = fs.readFileSync('coverage.md', 'utf-8');
           const prNumber = context.payload.pull_request.number;
 
           // Create a comment with the coverage report
@@ -53,7 +54,7 @@ jobs:
             issue_number: prNumber,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Code Coverage Report:\n```html\n' + report + '\n```',
+            body: 'Code Coverage Report: (Markdown)\n' + markdownReport,
             });
     
     - name: Generate Coverage Percent
