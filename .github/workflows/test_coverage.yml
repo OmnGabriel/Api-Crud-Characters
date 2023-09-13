@@ -47,14 +47,14 @@ jobs:
           const fs = require('fs');
           const report = fs.readFileSync('coverage.html', 'utf-8');
           const prNumber = context.payload.pull_request.number;
-  
+
           // Create a comment with the coverage report
-          github.issues.createComment({
-          issue_number: prNumber,
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          body: 'Code Coverage Report:\n```html\n' + report + '\n```',
-          });
+          github.rest.issues.createComment({
+            issue_number: prNumber,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Code Coverage Report:\n```html\n' + report + '\n```',
+            });
     
     - name: Generate Coverage Percent
       run: |
