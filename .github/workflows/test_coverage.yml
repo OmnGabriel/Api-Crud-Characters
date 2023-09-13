@@ -6,18 +6,21 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-    - name: "test"
-      run: |
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+      
+      - name: "test"
+        run: |
           go test -cover -coverprofile coverage.txt -race -v ./...
 
-    - name: "pull request comment"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git fetch origin master
-          go get github.com/johejo/go-cover-view
-          go install github.com/johejo/go-cover-view
-          go-cover-view -ci github-actions -git-diff-base origin/master
+      - name: "pull request comment"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            git fetch origin master
+            go get github.com/johejo/go-cover-view
+            go install github.com/johejo/go-cover-view
+            go-cover-view -ci github-actions -git-diff-base origin/master
 
             
             
