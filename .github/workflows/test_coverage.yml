@@ -34,11 +34,27 @@ jobs:
         go tool cover -html=coverage.out -o coverage.html >> $GITHUB_STEP_SUMMARY
     
     - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
           name: coverage-report
           path: coverage.html
-        
+
+    - name: Comment on PR with code coverage report
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('coverage.html', 'utf-8');
+          const prNumber = context.payload.pull_request.number;
+  
+          // Create a comment with the coverage report
+          github.issues.createComment({
+          issue_number: prNumber,
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          body: 'Code Coverage Report:\n```html\n' + report + '\n```',
+          });
     
     - name: Generate Coverage Percent
       run: |
