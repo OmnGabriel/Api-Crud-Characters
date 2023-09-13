@@ -31,7 +31,7 @@ jobs:
     - name: Run tests and generate coverage report and comment in PR
       run: |
         go install github.com/jstemmer/go-junit-report/v2@latest
-        go test -v -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+        GIN_MODE=release go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
         go-junit-report < coverage.out > report.xml
       # GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
       # go tool cover -html=coverage.out -o coverage.html
@@ -49,15 +49,15 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs');
-          const markdownReport = fs.readFileSync('coverage.md', 'utf-8');
+          const xmlReport = fs.readFileSync('report.xml', 'utf-8');
           const prNumber = context.payload.pull_request.number;
 
-          // Create a comment with the coverage report
-          github.rest.issues.createComment({
-            issue_number: prNumber,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: 'Code Coverage Report: (Markdown)\n' + markdownReport,
+
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'XML Code Coverage Report:\n```\n' + xmlReport + '\n```',
             });
     
     - name: Generate Coverage Percent
