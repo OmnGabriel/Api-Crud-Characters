@@ -14,8 +14,9 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-    - name: Go cover diff
-      uses: kskitek/coverdiff@v0.4.0
+    - name: Barecheck - Code Coverage
+      uses: barecheck/code-coverage-action@v1.0.0
+            
             
             
 
