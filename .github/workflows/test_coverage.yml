@@ -1,5 +1,4 @@
-name: Coverage
-
+name: Test coverage report
 concurrency:
   cancel-in-progress: true
   group: coverdiff-${{ github.ref }}
@@ -11,13 +10,12 @@ permissions:
   pull-requests: write
 
 jobs:
-
-  build:
+  main:
+    name: Coverage
     runs-on: ubuntu-latest
-
     steps:
     - name: Go cover diff
-      uses: kskitek/coverdiff@v0.3.0
+      uses: kskitek/coverdiff@v0.4.0
 
     # steps:
     # - uses: actions/checkout@v3
