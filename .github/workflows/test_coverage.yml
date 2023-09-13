@@ -1,81 +1,87 @@
 name: Coverage
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+concurrency:
+  cancel-in-progress: true
+  group: coverdiff-${{ github.ref }}
+
+on: [pull_request]
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Go cover diff
+      uses: kskitek/coverdiff@v0.3.0
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
-        token: ${{ secrets.GH_TOKEN }}
+    # steps:
+    # - uses: actions/checkout@v3
+
+    # - name: Set up Go
+    #   uses: actions/setup-go@v4
+    #   with:
+    #     go-version: '1.20'
+    #     token: ${{ secrets.GH_TOKEN }}
   
-    - name: UpDocker
-      run: docker-compose up -d
+    # - name: UpDocker
+    #   run: docker-compose up -d
    
-    - name: Build 
-      run: go build -v
+    # - name: Build 
+    #   run: go build -v
   
-    - name: Run tests and generate coverage report and comment in PR
-      run: |
-        GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
-        go tool cover -html=coverage.out -o coverage.html
+    # - name: Run tests and generate coverage report and comment in PR
+    #   run: |
+    #     GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
+    #     go tool cover -html=coverage.out -o coverage.html
 
-        PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
-        echo "Número do PR: $PR_NUMBER"
+    #     PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+    #     echo "Número do PR: $PR_NUMBER"
 
-        GITHUB_REPOSITORY="OmnGabriel/Api-Crud-Characters"
+    #     GITHUB_REPOSITORY="OmnGabriel/Api-Crud-Characters"
 
-        coverage_report= $(cat coverage.html)
-        curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -d "{\"body\":\"![Coverage Report](data:text/html;base64,$coverage_report)\"}" \
-          "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
+    #     coverage_report= $(cat coverage.html)
+    #     curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+    #       -d "{\"body\":\"![Coverage Report](data:text/html;base64,$coverage_report)\"}" \
+    #       "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
           
-        echo "Coverage Report: $coverage_report"
-        echo "Número do PR: $PR_NUMBER"
-        base64 -w 0 coverage.html
+    #     echo "Coverage Report: $coverage_report"
+    #     echo "Número do PR: $PR_NUMBER"
+    #     base64 -w 0 coverage.html
 
     
-    - name: Generate Coverage Percent
-      run: |
-        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
+    # - name: Generate Coverage Percent
+    #   run: |
+    #     GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
-        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-
-        COVERAGE_GATE=87.1
-        if [ $CODE_COVERAGE -lt $COVERAGE_GATE ]; then
-          COLOR=red
-        else
-          COLOR=green
-        fi
+    #     PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
+    #     CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+    #     COVERAGE_GATE=87.1
         
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout badge -f
-        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
-        git add badge.svg
-        git commit -m "change badge" || true
-        git push origin badge
-
-        if [ $CODE_COVERAGE -lt $COVERAGE_GATE  ]; then
-          printf "\033[0;31mCode coverage: %.1f%% is less than required: %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
-          exit -1
-        else
-          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
-        fi
+    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+    #       COLOR=red
+    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+    #       COLOR=green
+    #     fi
+        
+    #     git config user.name github-actions
+    #     git config user.email github-actions@github.com
+    #     git fetch
+    #     git checkout badge -f
+    #     curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
+    #     git add badge.svg
+    #     git commit -m "change badge" || true
+    #     git push origin badge
+        
+    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+    #       printf "\033[0;31mCode coverage: %.1f%% is less than required: %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
+    #       exit -1
+    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+    #       printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
+    #     fi
 
       
