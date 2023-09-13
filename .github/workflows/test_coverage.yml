@@ -1,29 +1,34 @@
-name: Test coverage report
-on: [pull_request]
-
+name: ci
+on:
+  pull_request:
+    branches:
+      - master
 jobs:
-  main:
-    name: Coverage
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        go: ["1.20"]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
-        token: ${{ secrets.GH_TOKEN }}
-      
-    - name: "test"
-      run: |
-        go test -cover -coverprofile coverage.txt -race -v ./...
-    - name: "pull request comment"
-      env:
-          run: |
-            git fetch origin master
-            go get github.com/johejo/go-cover-view
-            go install github.com/johejo/go-cover-view
-            go-cover-view -ci github-actions -git-diff-base origin/master
+      - name: "test"
+        run: |
+          go test -cover -coverprofile coverage.txt -race -v ./...
+
+      - name: "pull request comment"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin master
+          go get github.com/johejo/go-cover-view
+          go install github.com/johejo/go-cover-view
+          go-cover-view -ci github-actions -git-diff-base origin/master
 
             
             
