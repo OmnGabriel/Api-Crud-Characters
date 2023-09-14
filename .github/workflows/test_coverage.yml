@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
     - uses: actions/checkout@v3
@@ -33,8 +33,6 @@ jobs:
         go install github.com/jstemmer/go-junit-report/v2@latest
         GIN_MODE=release go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
         go-junit-report < coverage.out > report.xml
-      # GIN_MODE=release go test -race -coverprofile=coverage.out -v -coverpkg=./controllers
-      # go tool cover -html=coverage.out -o coverage.html
 
     
     - name: Upload coverage HTML report
@@ -50,8 +48,6 @@ jobs:
           PR_COMMENT="$output"
           gh pr comment $PR_NUMBER --body "$PR_COMMENT"
 
-      # comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
-      # curl -X POST -H "Authorization: token $GH_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
     - name: Generate Coverage Percent
       run: |
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
