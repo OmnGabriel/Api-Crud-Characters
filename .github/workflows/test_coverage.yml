@@ -47,7 +47,7 @@ jobs:
       id: script
       run: |
           output=$(go run Scripts/script.go)
-          echo "{output}={$output}" >> $GITHUB_OUTPUT
+          echo "{output}={output}" >> $GITHUB_OUTPUT
 
     
     - name: Criar um comentário no PR
