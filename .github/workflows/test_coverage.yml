@@ -54,7 +54,6 @@ jobs:
       run: |
             output="${{ steps.script.outputs.output }}"
             PR_COMMENT="$output"
-            echo "Comentando no PR #${pr_number}..."
             gh pr comment $PR_NUMBER --body "$PR_COMMENT"
       # comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
       # curl -X POST -H "Authorization: token $GH_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
