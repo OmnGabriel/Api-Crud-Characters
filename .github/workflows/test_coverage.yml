@@ -56,7 +56,7 @@ jobs:
             output="${{ steps.script.outputs.output }}"
             comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
             echo "Comentando no PR #${pr_number}..."
-            curl -X POST -H "Authorization: token $GITHUB_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr_number/comments"
+            curl -X POST -H "Authorization: token $GH_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr_number/comments"
     
     - name: Generate Coverage Percent
       run: |
