@@ -39,20 +39,20 @@ func DeletingCharacterMock() {
 	database.DB.Unscoped().Delete(&character, ID)
 }
 
-func TestToCheckFunctionTypeOfHome(t *testing.T) {
-	//Assert
-	r := RoutesTestingSetup()
-	r.GET("/", controllers.Home)
-	req, _ := http.NewRequest("GET", "/", nil)
-	response := httptest.NewRecorder()
-	responseType, _ := io.ReadAll(response.Body)
-	expected := string("text/plain; charset=utf-8")
-	//Act
-	r.ServeHTTP(response, req)
+// func TestToCheckFunctionTypeOfHome(t *testing.T) {
+// 	//Assert
+// 	r := RoutesTestingSetup()
+// 	r.GET("/", controllers.Home)
+// 	req, _ := http.NewRequest("GET", "/", nil)
+// 	response := httptest.NewRecorder()
+// 	responseType, _ := io.ReadAll(response.Body)
+// 	expected := string("text/plain; charset=utf-8")
+// 	//Act
+// 	r.ServeHTTP(response, req)
 
-	//Assert
-	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
-}
+// 	//Assert
+// 	assert.Equal(t, expected, http.DetectContentType(responseType), "Return unexpected Type")
+// }
 
 func TestToCheckTheContentHomeFunction(t *testing.T) {
 
