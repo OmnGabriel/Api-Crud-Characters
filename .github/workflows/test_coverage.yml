@@ -43,18 +43,13 @@ jobs:
           name: coverage-report
           path: report.xml
 
-    - name: Executar o script Go e capturar a saída
+    - name: Executar o script Go e capturar a saída e Criar um comentário no PR
       id: script
       run: |
           output=$(go run Scripts/script.go)
-          echo "{output}={output}" >> $GITHUB_OUTPUT
+          PR_COMMENT="$output"
+          gh pr comment $PR_NUMBER --body "$PR_COMMENT"
 
-    
-    - name: Criar um comentário no PR
-      run: |
-            output="${{ steps.script.outputs.output }}"
-            PR_COMMENT="$output"
-            gh pr comment $PR_NUMBER --body "$PR_COMMENT"
       # comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
       # curl -X POST -H "Authorization: token $GH_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
     - name: Generate Coverage Percent
