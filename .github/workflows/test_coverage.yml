@@ -52,12 +52,12 @@ jobs:
     
     - name: Criar um comentário no PR
       run: |
-            pr_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
             output="${{ steps.script.outputs.output }}"
-            comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
+            PR_COMMENT="$output"
             echo "Comentando no PR #${pr_number}..."
-            curl -X POST -H "Authorization: token $GH_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr_number/comments"
-    
+            gh pr comment $PR_NUMBER --body "$PR_COMMENT"
+      # comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
+      # curl -X POST -H "Authorization: token $GH_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
     - name: Generate Coverage Percent
       run: |
         GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
