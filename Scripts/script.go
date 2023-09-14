@@ -42,8 +42,8 @@ func main() {
 	}
 
 	// Crie um cabeçalho de tabela Markdown
-	fmt.Println("|             Suite Name                |   Tests   |                                      	         Coverage	     				       |")
-	fmt.Println("|---------------------------------------|-----------|----------------------------------------------------------------------------------------------------------|")
+	fmt.Println("|	Suite Name	|   Tests	|	Coverage	|")
+	fmt.Println("|-----|-----|-----|")
 
 	// Preencha a tabela Markdown com dados
 	for _, suite := range testSuites.Testsuites {
@@ -52,7 +52,7 @@ func main() {
 		coverage := suite.Coverage // A cobertura de testes
 
 		// Crie uma linha na tabela Markdown
-		row := fmt.Sprintf("| %s |     %d     | %s |", suiteName, tests, coverage)
+		row := fmt.Sprintf("| %s | %d | %s |", suiteName, tests, coverage)
 		fmt.Println(row)
 	}
 }
