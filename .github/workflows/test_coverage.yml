@@ -30,9 +30,9 @@ jobs:
   
     - name: Run tests and generate coverage report and comment in PR
       run: |
-        go tool cover -html=coverage.out -o coverage.html
         go install github.com/jstemmer/go-junit-report/v2@latest
         GIN_MODE=release go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+        go tool cover -html=coverage.out -o coverage.html
         go-junit-report < coverage.out > report.xml
     
     - name: Upload coverage HTML report
