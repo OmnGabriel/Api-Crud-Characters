@@ -43,22 +43,20 @@ jobs:
           name: coverage-report
           path: report.xml
 
-    - name: Comment on PR with code coverage report
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const fs = require('fs');
-          const xmlReport = fs.readFileSync('report.xml', 'utf-8');
-          const prNumber = context.payload.pull_request.number;
+    - name: Executar o script Go e capturar a saída
+      id: script
+      run: |
+          output=$(go run script.go)
+          echo "{output}={$output}" >> $GITHUB_OUTPUT
 
-
-            github.rest.issues.createComment({
-              issue_number: prNumber,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'XML Code Coverage Report:\n```\n' + xmlReport + '\n```',
-            });
+    
+    - name: Criar um comentário no PR
+      run: |
+            pr_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+            output="${{ steps.script.outputs.output }}"
+            comment_body="Resultado do Script:\n\`\`\`\n$output\n\`\`\`"
+            echo "Comentando no PR #${pr_number}..."
+            curl -X POST -H "Authorization: token $GITHUB_TOKEN" -d "{\"body\":\"$comment_body\"}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr_number/comments"
     
     - name: Generate Coverage Percent
       run: |
