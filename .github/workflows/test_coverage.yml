@@ -46,7 +46,7 @@ jobs:
     - name: Executar o script Go e capturar a saída
       id: script
       run: |
-          output=$(go run script.go)
+          output=$(go run Scripts/script.go)
           echo "{output}={$output}" >> $GITHUB_OUTPUT
 
     
