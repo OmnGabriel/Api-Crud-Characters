@@ -34,20 +34,11 @@ jobs:
 
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-
-    # - name: check test coverage
-    #   uses: vladopajic/go-test-coverage@v2
-    #   with: 
-    #       profile: cover.out
-    #       local-prefix: github.com/org/project
-    #       threshold-file: 50
-    #       threshold-package: 50
-    #       threshold-total: 50
           
     - name: Generate Coverage Badge
       run: |
         go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
-        go tool cover -func=coverage.txt  
+        go tool cover -func=coverage.txt  >> coverage.txt  
 
         COVERAGE_GATE=60
         LAST_LINE=$(tac coverage.txt | sed -n 1p)
