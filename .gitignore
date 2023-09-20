@@ -4,4 +4,3 @@ coverage.html
 go-api-rest.git
 report.xml
 .DS_Store
-cov*
