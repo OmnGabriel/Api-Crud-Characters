@@ -29,6 +29,9 @@ jobs:
     - name: Build 
       run: go build -v
 
+    - name: generate test coverage
+      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+
     - name: check test coverage
       uses: vladopajic/go-test-coverage@v2
       with: 
@@ -73,8 +76,7 @@ jobs:
           name: coverage-report
           path: coverage.html
         
-    - name: generate test coverage
-      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+
       
 
          
