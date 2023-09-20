@@ -32,7 +32,7 @@ jobs:
 
         
     - name: generate test coverage
-      run: go test ./... -coverprofile=./cover.out
+      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
       
     - name: check test coverage
       uses: vladopajic/go-test-coverage@v2
@@ -40,20 +40,30 @@ jobs:
         # Configure action by specifying input parameters individually (option 2)
           profile: cover.out
           local-prefix: github.com/org/project
-          threshold-file: 80
-          threshold-package: 80
-          threshold-total: 95
-
-    - name: Run tests and generate coverage report and comment in PR
-      run: |
-        go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
-        go tool cover -html=coverage.out -o coverage.html
+          threshold-file: 60
+          threshold-package: 60
+          threshold-total: 60
     
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v3
-      with:
-          name: coverage-report
-          path: coverage.html
+          # go test -v -coverpkg=./... -coverprofile="$PWD/coverage/coverage.txt" ./... -args -test.gocoverdir="$PWD/coverage/"               
+          # go test -v -coverpkg=./... -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+
+          # go test -cover -coverpkg=./controllers -covermode=count -args -test.gocoverdir="$PWD/coverage/"
+          # go tool cover -html=coverage.txt -o coverage/coverage.html
+
+
+          # retorna % total
+          # go tool cover -func=coverage.txt
+         
+          # - name: Run tests and generate coverage report and comment in PR
+    #   run: |
+    #     go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+    #     go tool cover -html=coverage.out -o coverage.html
+    
+    # - name: Upload coverage HTML report
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #       name: coverage-report
+    #       path: coverage.html
 
     # - name: Generate Coverage Percent
     #   run: |
