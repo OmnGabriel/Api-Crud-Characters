@@ -29,47 +29,15 @@ jobs:
     - name: Build 
       run: go build -v
 
-
-        
-    - name: generate test coverage
-      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-      
-    - name: check test coverage
-      uses: vladopajic/go-test-coverage@v2
-      with: 
-          profile: cover.out
-          local-prefix: github.com/org/project
-          # threshold-file: 50
-          # threshold-package: 50
-          threshold-total: 50
-
-          # go test -cover -coverpkg=./controllers -covermode=count -args -test.gocoverdir="$PWD/coverage/"
-          # go tool cover -html=coverage.txt -o coverage/coverage.html
-
-
-          # retorna % total
-          # go tool cover -func=coverage.txt
-         
-          # - name: Run tests and generate coverage report and comment in PR
-    #   run: |
-    #     go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
-    #     go tool cover -html=coverage.out -o coverage.html
-    
-    # - name: Upload coverage HTML report
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #       name: coverage-report
-    #       path: coverage.html
-
     - name: Generate Coverage Badge
       run: |
         go test -v -coverpkg=./... ./... -coverprofile=./cover.out
         go tool cover -func=cover.out  
 
+        COVERAGE_GATE=60
         LAST_LINE=$(tac cover.out | sed -n 1p)
-
         CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-        COVERAGE_GATE=60.8
+        
         if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
           COLOR=red
         elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
@@ -84,6 +52,29 @@ jobs:
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
+        
+    - name: generate test coverage
+      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+      
+    - name: check test coverage
+      uses: vladopajic/go-test-coverage@v2
+      with: 
+          profile: cover.out
+          local-prefix: github.com/org/project
+          threshold-file: 50
+          threshold-package: 50
+          threshold-total: 50
+         
+    - name: Run tests and Upload coverage HTML report
+    - run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+        go tool cover -html=cover.out -o coverage.html
+    - uses: actions/upload-artifact@v3
+      with:
+          name: coverage-report
+          path: coverage.html
+
+
 
 
         
