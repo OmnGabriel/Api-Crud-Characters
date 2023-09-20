@@ -40,9 +40,9 @@ jobs:
         # Configure action by specifying input parameters individually (option 2)
           profile: cover.out
           local-prefix: github.com/org/project
-          threshold-file: 60
-          threshold-package: 60
-          threshold-total: 60
+          threshold-file: 80
+          threshold-package: 80
+          threshold-total: 95
     
           # go test -v -coverpkg=./... -coverprofile="$PWD/coverage/coverage.txt" ./... -args -test.gocoverdir="$PWD/coverage/"               
           # go test -v -coverpkg=./... -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
