@@ -29,6 +29,9 @@ jobs:
     - name: Build 
       run: go build -v
 
+    - name: General test coverage
+      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+
     - name: Run test for badge
       run: |
         go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt 
