@@ -34,15 +34,15 @@ jobs:
         go test -v -coverpkg=./... ./... -coverprofile=./cover.out
         go tool cover -func=cover.out  
 
-        COVERAGE_GATE=60
-        LAST_LINE=$(tac cover.out | sed -n 1p)
-        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        # COVERAGE_GATE=60
+        # LAST_LINE=$(tac cover.out | sed -n 1p)
+        # CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
         
-        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-          COLOR=red
-        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-          COLOR=green
-        fi
+        # if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+        #   COLOR=red
+        # elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+        #   COLOR=green
+        # fi
       
         git config user.name github-actions
         git config user.email github-actions@github.com
