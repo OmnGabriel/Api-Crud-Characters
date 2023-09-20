@@ -32,7 +32,7 @@ jobs:
 
     - run: | 
         COVERAGE_GATE=60
-        LAST_LINE=$(tac coverage.txt | sed -n 1p)
+        LAST_LINE=$(tac coverage.txt | sed -n 2p)
         CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
         
         if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
