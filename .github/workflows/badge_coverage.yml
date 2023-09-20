@@ -33,7 +33,8 @@ jobs:
         go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt 
         go tool cover -func=coverage.txt >> coverage.txt
 
-    - run: |
+    - name: Generate Badge in readme
+      run: |
         LAST_LINE=$(tac coverage.txt | sed -n 1p)
         COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
         COLOR=orange
