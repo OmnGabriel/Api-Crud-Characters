@@ -1,19 +1,19 @@
 name: Coverage
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  - pull_request
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -21,18 +21,21 @@ jobs:
         go-version: '1.20'
         token: ${{ secrets.GH_TOKEN }}
 
+        
+  
     - name: UpDocker
       run: docker-compose up -d
    
     - name: Build 
       run: go build -v
 
-    - name: Test
+    - name: Run test for badge
       run: |
         go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt 
-        go tool cover -func=coverage.txt >> coverage.txt 
+        go tool cover -func=coverage.txt >> coverage.txt
 
-    - run: |
+    - name: Generate badge
+      run: |
         PENULTIMA_LINHA=$(tac coverage.txt | sed -n 1p)
         COBERTURA=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
         COLOR=orange
@@ -49,3 +52,23 @@ jobs:
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
+
+    - name: Run tests and generate html file
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
+        go tool cover -html=coverage.txt -o coverage.html
+        
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+          name: coverage-report
+          path: coverage.html
+
+    - name: check test coverage
+      uses: vladopajic/go-test-coverage@v2
+      with: 
+          profile: cover.out
+          local-prefix: github.com/org/project
+          threshold-file: 50
+          threshold-package: 50
+          threshold-total: 50
