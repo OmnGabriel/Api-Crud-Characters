@@ -15,12 +15,6 @@ jobs:
       PR_NUMBER: ${{ github.event.pull_request.number }}
     
     steps:
-    - uses: mainmatter/continue-on-error-comment@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        outcome: ${{ steps.build.outcome }}
-        test-id: Error code ${{ matrix.code }}
-
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
 
@@ -41,15 +35,14 @@ jobs:
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
 
-    - name: check test coverage
-      uses: vladopajic/go-test-coverage@v2
-      with: 
-          profile: cover.out
-          local-prefix: github.com/org/project
-          threshold-file: 50
-          threshold-package: 50
-          threshold-total: 50
-          continue-on-failure: true
+    # - name: check test coverage
+    #   uses: vladopajic/go-test-coverage@v2
+    #   with: 
+    #       profile: cover.out
+    #       local-prefix: github.com/org/project
+    #       threshold-file: 50
+    #       threshold-package: 50
+    #       threshold-total: 50
           
     - name: Generate Coverage Badge
       run: |
@@ -77,14 +70,23 @@ jobs:
 
     - name: Run tests and generate html file
       run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-        go tool cover -html=cover.out -o coverage.html
+        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
+        go tool cover -html=coverage.txt -o coverage.html
         
     - name: Upload coverage HTML report
       uses: actions/upload-artifact@v3
       with:
           name: coverage-report
           path: coverage.html
+
+    - name: check test coverage
+      uses: vladopajic/go-test-coverage@v2
+      with: 
+          profile: cover.out
+          local-prefix: github.com/org/project
+          threshold-file: 50
+          threshold-package: 50
+          threshold-total: 50
         
 
       
