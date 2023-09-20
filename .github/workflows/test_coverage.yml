@@ -29,29 +29,29 @@ jobs:
     - name: Build 
       run: go build -v
 
-    - name: Generate Coverage Badge
-      run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
-        go tool cover -func=coverage.txt  
+    # - name: Generate Coverage Badge
+    #   run: |
+    #     go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
+    #     go tool cover -func=coverage.txt  
 
-        COVERAGE_GATE=60
-        LAST_LINE=$(tac coverage.txt | sed -n 1p)
-        CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
+    #     COVERAGE_GATE=60
+    #     LAST_LINE=$(tac coverage.txt | sed -n 1p)
+    #     CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
         
-        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-          COLOR=red
-        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-          COLOR=green
-        fi
+    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+    #       COLOR=red
+    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+    #       COLOR=green
+    #     fi
       
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout badge -f
-        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
-        git add badge.svg
-        git commit -m "change badge" || true
-        git push origin badge
+    #     git config user.name github-actions
+    #     git config user.email github-actions@github.com
+    #     git fetch
+    #     git checkout badge -f
+    #     curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
+    #     git add badge.svg
+    #     git commit -m "change badge" || true
+    #     git push origin badge
 
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
