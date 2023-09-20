@@ -28,7 +28,7 @@ jobs:
       run: go build -v
 
     - name: Test
-      run: go tool cover -func=cover.out  >> coverage.txt 
+      run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage.txt
 
     - run: | 
         COVERAGE_GATE=60
