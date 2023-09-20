@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 
 	"github.com/OmnGabriel/go-api-rest.git/controllers"
@@ -204,5 +201,4 @@ func TestToCheckFunctionTypeOfAllCharacters(t *testing.T) {
 // 	response := httptest.NewRecorder()
 // 	r.ServeHTTP(response, req)
 // 	assert.Equal(t, http.StatusOK, response.Code)
-
-}
+// }

@@ -15,6 +15,7 @@ jobs:
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -27,13 +28,26 @@ jobs:
    
     - name: Build 
       run: go build -v
-  
+
+
+        
+    - name: generate test coverage
+      run: go test ./... -coverprofile=./cover.out
+      
+    - name: check test coverage
+      uses: vladopajic/go-test-coverage@v2
+      with: 
+        # Configure action by specifying input parameters individually (option 2)
+          profile: cover.out
+          local-prefix: github.com/org/project
+          threshold-file: 80
+          threshold-package: 80
+          threshold-total: 95
+
     - name: Run tests and generate coverage report and comment in PR
       run: |
-        go install github.com/jstemmer/go-junit-report/v2@latest
-        GIN_MODE=release go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+        go test -v -coverpkg=./controllers -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
         go tool cover -html=coverage.out -o coverage.html
-        go-junit-report < coverage.out > report.xml
     
     - name: Upload coverage HTML report
       uses: actions/upload-artifact@v3
@@ -41,40 +55,33 @@ jobs:
           name: coverage-report
           path: coverage.html
 
-    - name: Run script and comment in PR
-      id: script
-      run: |
-          output=$(go run Scripts/script.go)
-          PR_COMMENT="$output"
-          gh pr comment $PR_NUMBER --body "$PR_COMMENT"
-
-    - name: Generate Coverage Percent
-      run: |
-        GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
+    # - name: Generate Coverage Percent
+    #   run: |
+    #     GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
         
-        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-        COVERAGE_GATE=87.1
-        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-          COLOR=red
-        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-          COLOR=green
-        fi
+    #     PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
+    #     CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+    #     COVERAGE_GATE=87.1
+    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+    #       COLOR=red
+    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+    #       COLOR=green
+    #     fi
       
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout badge -f
-        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
-        git add badge.svg
-        git commit -m "change badge" || true
-        git push origin badge
-        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-          printf "\033[0;31mCode coverage: %.1f%% is less than required: %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
-          exit -1
-        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-          printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
-        fi
+    #     git config user.name github-actions
+    #     git config user.email github-actions@github.com
+    #     git fetch
+    #     git checkout badge -f
+    #     curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
+    #     git add badge.svg
+    #     git commit -m "change badge" || true
+    #     git push origin badge
+    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+    #       printf "\033[0;31mCode coverage: %.1f%% is less than required: %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
+    #       exit -1
+    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+    #       printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
+    #     fi
 
         
 
