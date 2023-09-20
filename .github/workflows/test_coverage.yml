@@ -13,7 +13,20 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
+    strategy:
+      matrix:
+        code: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    
     steps:
+    - run: sleep $((RANDOM % 30)) && exit ${{ matrix.code }}
+      continue-on-error: true
+
+    - uses: mainmatter/continue-on-error-comment@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        outcome: ${{ steps.build.outcome }}
+        test-id: Error code ${{ matrix.code }}
+
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
 
@@ -22,36 +35,14 @@ jobs:
       with:
         go-version: '1.20'
         token: ${{ secrets.GH_TOKEN }}
+
+        
   
     - name: UpDocker
       run: docker-compose up -d
    
     - name: Build 
       run: go build -v
-
-    # - name: Generate Coverage Badge
-    #   run: |
-    #     go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
-    #     go tool cover -func=coverage.txt  
-
-    #     COVERAGE_GATE=60
-    #     LAST_LINE=$(tac coverage.txt | sed -n 1p)
-    #     CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
-        
-    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-    #       COLOR=red
-    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-    #       COLOR=green
-    #     fi
-      
-    #     git config user.name github-actions
-    #     git config user.email github-actions@github.com
-    #     git fetch
-    #     git checkout badge -f
-    #     curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
-    #     git add badge.svg
-    #     git commit -m "change badge" || true
-    #     git push origin badge
 
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
@@ -64,18 +55,42 @@ jobs:
           threshold-file: 50
           threshold-package: 50
           threshold-total: 50
+          continue-on-failure: true
+          
+    - name: Generate Coverage Badge
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
+        go tool cover -func=coverage.txt  
 
-
-    # - name: Run tests and generate html file
-    #   run: |
-    #     go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-    #     go tool cover -html=cover.out -o coverage.html
+        COVERAGE_GATE=60
+        LAST_LINE=$(tac coverage.txt | sed -n 1p)
+        CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
         
-    # - name: Upload coverage HTML report
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #       name: coverage-report
-    #       path: coverage.html
+        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+          COLOR=red
+        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+          COLOR=green
+        fi
+      
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout badge -f
+        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
+        git add badge.svg
+        git commit -m "change badge" || true
+        git push origin badge
+
+    - name: Run tests and generate html file
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+        go tool cover -html=cover.out -o coverage.html
+        
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+          name: coverage-report
+          path: coverage.html
         
 
       
