@@ -37,8 +37,7 @@ jobs:
           
     - name: Generate Coverage Badge
       run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
-        go tool cover -func=coverage.txt  >> coverage.txt  
+        go tool cover -func=cover.out  >> coverage.txt  
 
         COVERAGE_GATE=60
         LAST_LINE=$(tac coverage.txt | sed -n 1p)
