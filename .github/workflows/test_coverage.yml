@@ -29,6 +29,30 @@ jobs:
     - name: Build 
       run: go build -v
 
+    - name: Generate Coverage Badge
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+        go tool cover -func=cover.out  
+
+        COVERAGE_GATE=60
+        LAST_LINE=$(tac cover.out | sed -n 1p)
+        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        
+        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+          COLOR=red
+        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+          COLOR=green
+        fi
+      
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout badge -f
+        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
+        git add badge.svg
+        git commit -m "change badge" || true
+        git push origin badge
+
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
 
@@ -41,40 +65,17 @@ jobs:
           threshold-package: 50
           threshold-total: 50
 
-    - name: Generate Coverage Badge
-      run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-        go tool cover -func=cover.out  
 
-        # COVERAGE_GATE=60
-        # LAST_LINE=$(tac cover.out | sed -n 1p)
-        # CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+    # - name: Run tests and generate html file
+    #   run: |
+    #     go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+    #     go tool cover -html=cover.out -o coverage.html
         
-        # if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-        #   COLOR=red
-        # elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-        #   COLOR=green
-        # fi
-      
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git fetch
-        git checkout badge -f
-        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
-        git add badge.svg
-        git commit -m "change badge" || true
-        git push origin badge
-
-    - name: Run tests and generate html file
-      run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-        go tool cover -html=cover.out -o coverage.html
-        
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v3
-      with:
-          name: coverage-report
-          path: coverage.html
+    # - name: Upload coverage HTML report
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #       name: coverage-report
+    #       path: coverage.html
         
 
       
