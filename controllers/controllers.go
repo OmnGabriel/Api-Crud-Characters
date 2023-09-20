@@ -41,33 +41,33 @@ func DeletACharacter(c *gin.Context) {
 
 }
 
-// func ReturnACharacter(c *gin.Context) {
-// 	var character models.Character
-// 	id := c.Params.ByName("id")
-// 	database.DB.First(&character, id)
+func ReturnACharacter(c *gin.Context) {
+	var character models.Character
+	id := c.Params.ByName("id")
+	database.DB.First(&character, id)
 
-// 	if character.ID == 0 {
-// 		c.JSON(http.StatusNotFound, gin.H{
-// 			"Not found": "Character not afound"})
-// 		return
-// 	}
+	if character.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not found": "Character not afound"})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, character)
-// }
+	c.JSON(http.StatusOK, character)
+}
 
-// func EditACharacter(c *gin.Context) {
-// 	var character models.Character
-// 	id := c.Params.ByName("id")
-// 	database.DB.First(&character, id)
+func EditACharacter(c *gin.Context) {
+	var character models.Character
+	id := c.Params.ByName("id")
+	database.DB.First(&character, id)
 
-// 	var characterToUpdate models.Character
-// 	if err := c.ShouldBindJSON(&characterToUpdate); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"erro": err.Error()})
-// 		return
-// 	}
+	var characterToUpdate models.Character
+	if err := c.ShouldBindJSON(&characterToUpdate); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"erro": err.Error()})
+		return
+	}
 
-// 	database.DB.Model(&character).Updates(characterToUpdate)
-// 	c.JSON(http.StatusOK, gin.H{"data": "Successfully changed character"})
-// 	c.JSON(http.StatusOK, character)
-// }
+	database.DB.Model(&character).Updates(characterToUpdate)
+	c.JSON(http.StatusOK, gin.H{"data": "Successfully changed character"})
+	c.JSON(http.StatusOK, character)
+}
