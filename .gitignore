@@ -1,2 +1,6 @@
 coverage-out.txt
+coverage.out
+coverage.html
 go-api-rest.git
+report.xml
+.DS_Store

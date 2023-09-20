@@ -1,0 +1,54 @@
+name: Generate Badge Coverage
+
+on:
+  - pull_request
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+        token: ${{ secrets.GH_TOKEN }}
+
+        
+  
+    - name: UpDocker
+      run: docker-compose up -d
+   
+    - name: Build 
+      run: go build -v
+
+    - name: Run test for badge
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt 
+        go tool cover -func=coverage.txt >> coverage.txt
+
+    - name: Generate Badge in readme
+      run: |
+        LAST_LINE=$(tac coverage.txt | sed -n 1p)
+        COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
+        COLOR=orange
+        if (( $(echo "$COVERAGE < 50" | bc -l) )); then
+          COLOR=red
+        elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+          COLOR=green
+        fi
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout badge -f
+        curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR" > badge.svg
+        git add badge.svg
+        git commit -m "change badge" || true
+        git push origin badge
+
