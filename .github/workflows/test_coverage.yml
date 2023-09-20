@@ -36,7 +36,7 @@ jobs:
 
         COVERAGE_GATE=60
         LAST_LINE=$(tac cover.out | sed -n 1p)
-        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
         
         if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
           COLOR=red
