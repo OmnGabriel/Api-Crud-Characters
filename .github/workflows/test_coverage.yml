@@ -31,11 +31,11 @@ jobs:
 
     - name: Generate Coverage Badge
       run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-        go tool cover -func=cover.out  
+        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
+        go tool cover -func=coverage.txt  
 
         COVERAGE_GATE=60
-        LAST_LINE=$(tac cover.out | sed -n 1p)
+        LAST_LINE=$(tac coverage.txt | sed -n 1p)
         CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
         
         if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
