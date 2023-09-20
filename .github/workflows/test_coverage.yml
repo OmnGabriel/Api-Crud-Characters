@@ -37,15 +37,11 @@ jobs:
     - name: check test coverage
       uses: vladopajic/go-test-coverage@v2
       with: 
-        # Configure action by specifying input parameters individually (option 2)
           profile: cover.out
           local-prefix: github.com/org/project
-          threshold-file: 0
-          threshold-package: 0
-          threshold-total: 0
-    
-          # go test -v -coverpkg=./... -coverprofile="$PWD/coverage/coverage.txt" ./... -args -test.gocoverdir="$PWD/coverage/"               
-          # go test -v -coverpkg=./... -covermode=count -coverprofile=coverage.txt ./...  2>&1 | tee coverage.out
+          threshold-file: 50
+          threshold-package: 50
+          threshold-total: 50
 
           # go test -cover -coverpkg=./controllers -covermode=count -args -test.gocoverdir="$PWD/coverage/"
           # go tool cover -html=coverage.txt -o coverage/coverage.html
@@ -65,33 +61,30 @@ jobs:
     #       name: coverage-report
     #       path: coverage.html
 
-    # - name: Generate Coverage Percent
-    #   run: |
-    #     GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
-        
-    #     PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
-    #     CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
-    #     COVERAGE_GATE=87.1
-    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-    #       COLOR=red
-    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-    #       COLOR=green
-    #     fi
+    - name: Generate Coverage Badge
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+        go tool cover -func=cover.out  
+
+        LAST_LINE=$(tac cover.out | sed -n 1p)
+
+        CODE_COVERAGE=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        COVERAGE_GATE=60.8
+        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+          COLOR=red
+        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+          COLOR=green
+        fi
       
-    #     git config user.name github-actions
-    #     git config user.email github-actions@github.com
-    #     git fetch
-    #     git checkout badge -f
-    #     curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
-    #     git add badge.svg
-    #     git commit -m "change badge" || true
-    #     git push origin badge
-    #     if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
-    #       printf "\033[0;31mCode coverage: %.1f%% is less than required: %.1f%%\033[0m\n" $CODE_COVERAGE $COVERAGE_GATE
-    #       exit -1
-    #     elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
-    #       printf "\033[0;32mCode coverage is %.1f%%\033[0m\n" $CODE_COVERAGE
-    #     fi
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git fetch
+        git checkout badge -f
+        curl "https://img.shields.io/badge/coverage-$COVERAGE_GATE%25-$COLOR" > badge.svg
+        git add badge.svg
+        git commit -m "change badge" || true
+        git push origin badge
+
 
         
 
