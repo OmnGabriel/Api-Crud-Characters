@@ -28,24 +28,22 @@ jobs:
       run: go build -v
 
     - name: Test
-      run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage.txt
+      run: GIN_MODE=release go test -race -v -coverpkg=./controllers >> coverage-out.txt
 
-    - run: | 
-        COVERAGE_GATE=60
-        LAST_LINE=$(tac coverage.txt | sed -n 2p)
-        CODE_COVERAGE=$(echo "$LAST_LINE" | grep -oE '[0-9]+\.?[0-9]*')
-        
-        if (( $(echo "$CODE_COVERAGE < $COVERAGE_GATE" | bc -l) )) ; then
+    - run: |
+        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 2p)
+        COBERTURA=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
+        COLOR=orange
+        if (( $(echo "$COBERTURA <= 50" | bc -l) )); then
           COLOR=red
-        elif (( $(echo "$COVERAGE >= $COVERAGE_GATE" | bc -l) )); then
+        elif (( $(echo "$COBERTURA > 80" | bc -l) )); then
           COLOR=green
         fi
-        
         git config user.name github-actions
         git config user.email github-actions@github.com
         git fetch
         git checkout badge -f
-        curl "https://img.shields.io/badge/coverage-$CODE_COVERAGE%25-$COLOR" > badge.svg
+        curl "https://img.shields.io/badge/coverage-$COBERTURA%25-$COLOR" > badge.svg
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
