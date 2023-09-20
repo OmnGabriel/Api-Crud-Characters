@@ -52,6 +52,17 @@ jobs:
         git add badge.svg
         git commit -m "change badge" || true
         git push origin badge
+
+    - name: Run tests and generate html file
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+        go tool cover -html=cover.out -o coverage.html
+        
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+          name: coverage-report
+          path: coverage.html
         
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
@@ -65,14 +76,6 @@ jobs:
           threshold-package: 50
           threshold-total: 50
          
-    - name: Run tests and Upload coverage HTML report
-    - run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
-        go tool cover -html=cover.out -o coverage.html
-    - uses: actions/upload-artifact@v3
-      with:
-          name: coverage-report
-          path: coverage.html
 
 
 
