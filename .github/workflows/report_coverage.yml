@@ -1,0 +1,48 @@
+name: Coverage
+
+on:
+  - pull_request
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+        token: ${{ secrets.GH_TOKEN }}
+
+        
+    - name: UpDocker
+      run: docker-compose up -d
+   
+    - name: Build 
+      run: go build -v
+
+    - name: Test coverage
+      run: |
+        go test -v -coverpkg=./... ./... -coverprofile=./cover.out
+        go tool cover -html=cover.out -o coverage.html
+        
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+          name: coverage-report
+          path: coverage.html
+
+    - name: check test coverage
+      uses: vladopajic/go-test-coverage@v2
+      with: 
+          profile: cover.out
+          local-prefix: github.com/org/project
+          threshold-file: 50
+          threshold-package: 50
+          threshold-total: 50

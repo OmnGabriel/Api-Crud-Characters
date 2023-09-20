@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
     
     steps:
     - uses: actions/checkout@v3
@@ -28,9 +27,6 @@ jobs:
    
     - name: Build 
       run: go build -v
-
-    - name: General test coverage
-      run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
 
     - name: Run test for badge
       run: |
@@ -56,22 +52,3 @@ jobs:
         git commit -m "change badge" || true
         git push origin badge
 
-    - name: Run tests and generate html file
-      run: |
-        go test -v -coverpkg=./... ./... -coverprofile=./coverage.txt
-        go tool cover -html=coverage.txt -o coverage.html
-        
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v3
-      with:
-          name: coverage-report
-          path: coverage.html
-
-    - name: check test coverage
-      uses: vladopajic/go-test-coverage@v2
-      with: 
-          profile: cover.out
-          local-prefix: github.com/org/project
-          threshold-file: 50
-          threshold-package: 50
-          threshold-total: 50
