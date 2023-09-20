@@ -33,7 +33,7 @@ jobs:
         go tool cover -func=coverage.txt >> coverage.txt 
 
     - run: |
-        PENULTIMA_LINHA=$(tac coverage-out.txt | sed -n 1p)
+        PENULTIMA_LINHA=$(tac coverage.txt | sed -n 1p)
         COBERTURA=$(echo "$PENULTIMA_LINHA" | grep -oE '[0-9]+\.?[0-9]*')
         COLOR=orange
         if (( $(echo "$COBERTURA <= 50" | bc -l) )); then
