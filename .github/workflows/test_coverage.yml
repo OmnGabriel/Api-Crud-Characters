@@ -29,6 +29,15 @@ jobs:
     - name: Build 
       run: go build -v
 
+    - name: check test coverage
+      uses: vladopajic/go-test-coverage@v2
+      with: 
+          profile: cover.out
+          local-prefix: github.com/org/project
+          threshold-file: 50
+          threshold-package: 50
+          threshold-total: 50
+
     - name: Generate Coverage Badge
       run: |
         go test -v -coverpkg=./... ./... -coverprofile=./cover.out
@@ -67,14 +76,7 @@ jobs:
     - name: generate test coverage
       run: go test -v -coverpkg=./... ./... -coverprofile=./cover.out
       
-    - name: check test coverage
-      uses: vladopajic/go-test-coverage@v2
-      with: 
-          profile: cover.out
-          local-prefix: github.com/org/project
-          threshold-file: 50
-          threshold-package: 50
-          threshold-total: 50
+
          
 
 
