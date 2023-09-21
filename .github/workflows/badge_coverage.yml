@@ -43,7 +43,7 @@ jobs:
           COLOR=green
         fi
 
-        curl -o coverage-badge.svg "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR-brightgreen.svg"
+        curl -o coverage-badge.svg "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg"
         
     - name: Upload badge to artifacts
       uses: actions/upload-artifact@v2
