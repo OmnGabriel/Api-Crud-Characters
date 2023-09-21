@@ -27,8 +27,8 @@ jobs:
         script: |
           const labelsToAdd = ["Waiting Validate by QA/PO"];
           await github.issues.addLabels({
-            owner: OmnGabriel,
-            repo: Api-Crud-Characters,
-            issue_number: context.issue.number,
-            labels: labelsToAdd
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          issue_number: context.issue.number,
+          labels: labelsToAdd
           });
